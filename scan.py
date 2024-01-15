@@ -39,7 +39,7 @@ MAX_SPEED = {
 SENSOR = {
     'x' : lambda : color_sensor.color(SENSOR_PORT['x']) is color.AZURE,
     'y' : lambda : color_sensor.color(SENSOR_PORT['y']) is color.AZURE,
-    'z' : lambda : force_sensor.pressed(SENSOR_PORT['z']), 
+    'z' : lambda : force_sensor.pressed(SENSOR_PORT['z']),
     'g' : lambda : motion_sensor.tilt_angles()[1]>100 or motion_sensor.tilt_angles()[1]<-100,
     'r' : lambda : color_sensor.color(SENSOR_PORT['x']) is color.RED
 }
@@ -82,8 +82,8 @@ async def init(xyz):
 
     motor.reset_relative_position(m, 0) # from now on, relative_position == 0 will be the reference position; won't raise the probe above this
     motor.run(m, v//2)
-    await until(SENSOR[xyz], timeout=TIMEOUT) 
-    motor.stop(m) 
+    await until(SENSOR[xyz], timeout=TIMEOUT)
+    motor.stop(m)
     chime()
     MAX_POS[xyz] = motor.relative_position(m)
     print("Max ",xyz,": ", MAX_POS[xyz])
@@ -116,7 +116,7 @@ async def probe(i, x, y):
     print(x, y, z)
     linegraph.plot(COLOR['x'], i, x)
     linegraph.plot(COLOR['y'], i, y)
-    linegraph.plot(COLOR['z'], i, z)        
+    linegraph.plot(COLOR['z'], i, z)
     await reset('z')
 
 async def user_stop():
