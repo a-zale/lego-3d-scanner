@@ -145,17 +145,22 @@ async def main():
 
     i = 0
     #linegraph.show(fullscreen=True)
-    for nx in range(MAX_POS['x']//INCREMENT['x']):
+    Nx = MAX_POS['x']//INCREMENT['x']
+    Ny = MAX_POS['y']//INCREMENT['y']
+    N = Nx * Ny
+    for nx in range(Nx):
         if SENSOR['x']() or STOP_EARLY:
             break
         await increment('x')
-        for ny in range(MAX_POS['y']//INCREMENT['y']):
+        for ny in range(Ny):
             if SENSOR['y']() or STOP_EARLY:
                 break
             await increment('y')
             await probe(i, nx*INCREMENT['x'], ny*INCREMENT['y'])
             linegraph.show(fullscreen=False)
             i += 1
+            print("Progress:", (i*100) // N, "%")
+            print()
         await reset('y')
 
     await reset('x')
