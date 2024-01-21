@@ -18,13 +18,22 @@ def denoise(Z):
     sub[is_outlier] = nbrs.mean(0)[is_outlier]
     return Z
 
-def grid(series, nx, ny):
+def grid(x, y, z):
     """
-    Shapes a 1D series of length <= nx*ny to (nx,ny)
+    1D x, y, z -> 2D X, Y, Z defined on grid
     """
-    g = np.full(nx*ny, np.nan)
-    g[:len(series)] = series
-    return g.reshape(nx,ny)
+    xvals, yvals = np.sort(np.unique(x)), np.sort(np.unique(y))
+    nx, ny = len(xvals), len(yvals)
+    x2i = { v:i for i,v in enumerate(xvals)  }
+    y2i = { v:i for i,v in enumerate(yvals)  }
+    X, Y, Z = ( np.full((nx, ny), np.nan) for _ in range(3) )
+    # scanner loops over x (outer) and y (inner), and y may stop early if the calibration sensor triggers the carriage return
+    # to-do: vectorize
+    for i in range(len(x)):
+        xval, yval, zval = ( vec[i] for vec in (x,y,z) )
+        idx = (x2i[xval], y2i[yval])
+        X[idx], Y[idx], Z[idx] = xval, yval, zval
+    return X, Y, Z
 
 def main():
     parser = argparse.ArgumentParser()
@@ -37,8 +46,7 @@ def main():
 
     pts = pd.read_csv(args.file, sep=';', names=['i', 'x', 'y', 'z'], header=0, index_col='i').to_numpy()
     x, y, z = pts[:,0], pts[:,1], pts[:,2]
-    nx, ny = len(np.unique(x)), len(np.unique(y))
-    X, Y, Z = grid(x, nx, ny), grid(y, nx, ny), grid(z, nx, ny)
+    X, Y, Z = grid(x, y, z)
     if args.denoise:
         denoise(Z)
 
